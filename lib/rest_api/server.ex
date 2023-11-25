@@ -21,9 +21,6 @@ defmodule RestApi.Server do
   end
 
   get "/book" do
-    stuff = fetch_query_params(conn) |> tap(&IO.inspect(&1, label: "👍"))
-    stuff |> tap(&IO.inspect(&1, label: "👍"))
-
     conn
     |> send_resp(200, "thank you for using apppp D:")
   end
@@ -31,7 +28,6 @@ defmodule RestApi.Server do
   get "/books" do
     {:ok, db} = Depo.open("db.sqlite3")
     books = Depo.read(db, "SELECT * FROM books;")
-
     Depo.close(db)
 
     conn
