@@ -23,7 +23,8 @@ defmodule RestApi.MixProject do
   defp deps do
     [
       {:plug_cowboy, "~> 2.0"},
-      {:jason, "~> 1.4"}
+      {:jason, "~> 1.4"},
+      {:depo, "~> 1.7"}
     ]
   end
 end

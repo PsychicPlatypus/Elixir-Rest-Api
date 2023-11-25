@@ -1,5 +1,6 @@
 defmodule RestApi.Server do
   use Plug.Router
+  alias Depo
 
   plug(:match)
 
@@ -25,6 +26,17 @@ defmodule RestApi.Server do
 
     conn
     |> send_resp(200, "thank you for using apppp D:")
+  end
+
+  get "/books" do
+    {:ok, db} = Depo.open("db.sqlite3")
+    books = Depo.read(db, "SELECT * FROM books;")
+
+    Depo.close(db)
+
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, Jason.encode!(books))
   end
 
   match _ do

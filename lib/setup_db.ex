@@ -1,8 +1,17 @@
-defmodule RestApi do
-  alias Depo
+defmodule Mix.Tasks.SetupDb do
+  @moduledoc "The setup_db mix task: `mix help setup_db`"
 
-  def setup_db() do
+  alias Depo
+  use Mix.Task
+
+  @shortdoc "Sets up database or creates the database file if it doesn't exist"
+  def run(_) do
+    setup_db()
+  end
+
+  defp setup_db() do
     if File.exists?("db.sqlite3") do
+      Mix.Task.run("app.start")
       {:ok, db} = Depo.open("db.sqlite3")
 
       Depo.write(
