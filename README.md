@@ -6,6 +6,7 @@ A REST-ful api server built in elixir with plug cowboy. Connected to a SQLite da
 
 The server runs on SQLite3, using the Depo adapter.
 There is a prebuild mix tasks that both creates and populates the database for you:
+
 ```ex
 mix setup_db
 ```
