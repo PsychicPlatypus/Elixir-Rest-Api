@@ -1,6 +1,6 @@
 defmodule RestApi.Server do
   use Plug.Router
-  alias Depo
+  alias RestApi.Domain.Database
 
   plug(:match)
 
@@ -13,22 +13,23 @@ defmodule RestApi.Server do
   plug(:dispatch)
 
   get "/book/:name" do
-    IO.inspect(name)
+    book = Database.get_book(name: name)
 
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(200, Jason.encode!(["stuff", "stuff", "stuff"]))
+    |> send_resp(200, Jason.encode!(book))
   end
 
   get "/book" do
+    book = Database.get_book(convert_to_klist(conn.query_params))
+
     conn
-    |> send_resp(200, "thank you for using apppp D:")
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, Jason.encode!(book))
   end
 
   get "/books" do
-    {:ok, db} = Depo.open("db.sqlite3")
-    books = Depo.read(db, "SELECT * FROM books;")
-    Depo.close(db)
+    books = Database.get_all_books()
 
     conn
     |> put_resp_content_type("application/json")
@@ -37,6 +38,16 @@ defmodule RestApi.Server do
 
   match _ do
     conn
-    |> send_resp(404, "Not Found, available routes: #{inspect(Plug.Router.module_info())}")
+    |> send_resp(404, "Not Found, available routes: /book, /book/:name, /books")
+  end
+
+  defp convert_to_klist(map) do
+    Enum.map(
+      map,
+      fn {key, value} -> {String.to_existing_atom(key), value} end
+    )
+  rescue
+    _ ->
+      []
   end
 end
