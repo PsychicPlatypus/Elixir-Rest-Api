@@ -5,27 +5,22 @@ defmodule RestApi.Domain.Database do
     extract_query_params(opts)
     |> case do
       %{query: [], variables: []} ->
-        {:ok, db} = Depo.open("db.sqlite3")
-        book = Depo.read(db, "SELECT * FROM books LIMIT 1;")
-        Depo.close(db)
-        book
+        execute_query("SELECT * FROM books LIMIT 1;")
 
       %{query: query, variables: vars} ->
-        query_str = query |> Enum.join(" AND ") |> tap(&IO.inspect(&1, label: "as"))
-
-        {:ok, db} = Depo.open("db.sqlite3")
-        book = Depo.read(db, "SELECT * FROM books WHERE " <> query_str <> ";", vars)
-        Depo.close(db)
-        book
+        query_str = query |> Enum.join(" AND ")
+        execute_query("SELECT * FROM books WHERE " <> query_str <> ";", vars)
     end
   end
 
-  def get_all_books() do
+  def get_all_books(), do: execute_query("SELECT * FROM books;")
+
+  defp execute_query(query, vars \\ []) do
     {:ok, db} = Depo.open("db.sqlite3")
-    books = Depo.read(db, "SELECT * FROM books;")
+    book = Depo.read(db, query, vars)
     Depo.close(db)
 
-    books
+    book
   end
 
   @spec extract_query_params(keyword()) :: %{variables: list(String.t()), query: list(String.t())}
